@@ -42,48 +42,36 @@
 <body>
 
   <div class="card" role="main" aria-labelledby="title">
-    <h1 id="title">BASE — Accès restreint</h1>
+    <h1 id="title"> Accès restreint</h1>
 
-    <label for="dob">Date de naissance de la victime</label>
-    <input id="dob" type="text" placeholder="ex : 5.02.2004 ou 05/02/2004">
+    <label for="dob">Date de naissance</label>
+    <input id="dob" type="text">
 
-    <label for="caseNo">Numéro de dossier</label>
-    <input id="caseNo" type="text" placeholder="ex : 52-15763">
+    <label for="caseNo">DOSSIER</label>
+    <input id="caseNo" type="text">
 
-    <div class="hint">Saisissez les informations exactes pour accéder à la page d'autopsie.</div>
+    <div class="hint">Saisissez les informations exactes.</div>
 
     <div class="row">
       <button id="checkBtn" type="button">Vérifier et ouvrir</button>
-      <div class="note">Interface style police-scientifique</div>
+      <div class="note"> POLICE SCIENTIFIQUE</div>
     </div>
-
-    <div class="note" style="margin-top:8px;">(Pour le jeu : DOB = <strong>5.02.2004</strong> — Dossier = <strong>52-15763</strong>)</div>
   </div>
 
   <div id="notif">🎉 Bravo — vous pouvez ouvrir l'enveloppe 2</div>
 
 <script>
-/* Config : valeurs acceptées (on accepte quelques formats courants) */
-const ACCEPTED_DOBS = [
-  // Normalisations acceptées (strings comparées sans espaces ni zéros inutiles)
-  "5.2.2004", "05.02.2004", "05/02/2004", "2004-02-05", "5.02.2004", "5/2/2004"
-];
-const ACCEPTED_CASES = [
-  "52-15763", "5215763", "52 15 763", "52.15.763"
-];
+const ACCEPTED_DOBS = ["5.2.2004","05.02.2004","05/02/2004","2004-02-05","5.02.2004","5/2/2004"];
+const ACCEPTED_CASES = ["52-15763","5215763","52 15 763","52.15.763"];
 
-/* helper : normaliser entrée */
 function normalize(s){
   return String(s||"").trim().toLowerCase().replace(/\s+/g,'').replace(/[^\d\-\/\.]/g,'');
 }
 
-/* vérifier dob en acceptant variantes */
 function matchDob(input){
   const n = normalize(input).replace(/(^0+)/,'').replace(/\/0+/g,'/').replace(/\.0+/g,'.');
-  // try simple direct compare after cleaning dots and slashes
   for(const v of ACCEPTED_DOBS){
     if(normalize(v).replace(/^0+/,'') === n) return true;
-    // compare more flexibly: replace / with . etc
     if(normalize(v).replace(/[\/\.]/g,'') === n.replace(/[\/\.]/g,'')) return true;
   }
   return false;
@@ -97,7 +85,6 @@ function matchCase(input){
   return false;
 }
 
-/* UI logic */
 const btn = document.getElementById('checkBtn');
 const dobEl = document.getElementById('dob');
 const caseEl = document.getElementById('caseNo');
@@ -106,11 +93,9 @@ const notif = document.getElementById('notif');
 function showNotif(text){
   notif.textContent = text;
   notif.style.display = 'block';
-  // auto-hide after 6s
   setTimeout(()=>{ notif.style.display='none'; }, 6000);
 }
 
-/* Redirect target (page finale fournie) */
 const TARGET_URL = "https://sites.google.com/view/scenesdecrimes/accueil/base-de-donn%C3%A9es/jcp";
 
 btn.addEventListener('click', ()=>{
@@ -118,14 +103,12 @@ btn.addEventListener('click', ()=>{
   const caseVal = caseEl.value;
   if(matchDob(dobVal) && matchCase(caseVal)){
     showNotif("🎉 Bravo — vous pouvez ouvrir l'enveloppe 2");
-    // petit délai pour laisser voir la notif avant redirection
     setTimeout(()=>{ window.location.href = TARGET_URL; }, 900);
   } else {
     showNotif("Erreur — informations incorrectes");
   }
 });
 
-/* Enter key support */
 [dobEl, caseEl].forEach(el=>{
   el.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') { btn.click(); }
